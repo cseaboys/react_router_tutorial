@@ -7,14 +7,18 @@ function Navbar() {
   const routes = useMemo(() => router.routes[0].children, []);
 
   return (
-    <nav className="flex justify-around items-center border-b border-black">
+    <nav className="grid grid-flow-col grid-rows-1 justify-around items-center border-b border-black">
       {routes.map((route) => (
         <NavLink
           key={route.path}
           to={route.path}
           className={({ isActive }) =>
-            `p-4 flex items-center justify-center h-full
-           ${isActive ? "text-cyan-500 font-bold" : "hover:font-semibold"}`
+            `p-4 flex items-center justify-center h-full min-w-20
+           ${
+             isActive
+               ? "text-cyan-500 font-bold"
+               : "hover:font-semibold"
+           }`
           }
         >
           {route.path === "/" ? "Home" : route.path.slice(1).toUpperCase()}
