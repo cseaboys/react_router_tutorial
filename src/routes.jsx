@@ -8,7 +8,7 @@ import { createBrowserRouter } from "react-router";
 import { Todos } from "./pages/Todos/Todos";
 import { TODO_API } from "./API_STORE";
 import { TodosErrorBoundary } from "./pages/Todos/TodosErrorBoundary";
-import TodoDetail from "./pages/TodoDetail.jsx";
+import TodoDetail from "./pages/Todos/TodoDetail.jsx";
 import LoadingCupGif from "./components/LoadingCup";
 
 export const router = createBrowserRouter([

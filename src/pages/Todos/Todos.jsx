@@ -8,7 +8,6 @@ export function Todos() {
     <div className="flex">
       <aside className="w-1/4 p-4">
         <h2 className="text-3xl">Todos</h2>
-        <LoadingCircleSmall />
         {todos_info.length === 0 ? (
           <div>No Todos Found</div>
         ) : (
@@ -17,17 +16,20 @@ export function Todos() {
               <div key={todo.id} className="">
                 <NavLink
                   to={`/todos/${todo.id}`}
-                  className={({ isActive, isPending }) =>
-                    `${
-                      isActive
-                        ? "text-cyan-500 font-bold"
-                        : "hover:font-semibold"
-                    }
-                    ${isPending ? "" : ""}`
+                  className={({ isActive }) =>
+                    isActive ? "text-cyan-500 font-bold" : "hover:font-semibold"
                   }
                 >
-                  <h4 className="text-lg">{todo.title}</h4>
+                  {({ isPending }) => (
+                    <div>
+                      <h4 className="text-lg">
+                        {todo.title}
+                        {isPending && <LoadingCircleSmall />}
+                      </h4>
+                    </div>
+                  )}
                 </NavLink>
+
               </div>
             ))}
           </div>

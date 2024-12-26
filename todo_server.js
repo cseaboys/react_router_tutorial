@@ -54,11 +54,12 @@ const todo_descriptions = [
     "Take the dog out for a walk around the block.",
 ];
 
-if (todo_titles.length != todo_descriptions.length) throw new Error(`Internal todo server error: todo's title and todo's description length is not equal, todo's title length: ${todo_titles.length}, todo's description length: ${todo_descriptions.length}\n\
+if (todo_titles.length !== todo_descriptions.length) {
+    throw new Error(`Internal todo server error: todo's title and todo's description length is not equal, todo's title length: ${todo_titles.length}, todo's description length: ${todo_descriptions.length}\n\
     Perhaps you changed the content of them?`);
+}
 
-// Calculate the number of todos based on the smaller array length
-const NUM_TODOS = todo_titles.length
+const NUM_TODOS = todo_titles.length;
 
 let todos = [];
 const seedTodos = () => {
@@ -76,6 +77,12 @@ seedTodos();
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+};
+
 const rootHandler = () => {
     const todoLinks = todos.map(todo =>
         `<li><a href="/todo?id=${todo.id}">${todo.title}</a></li>`
@@ -88,7 +95,10 @@ const rootHandler = () => {
             ${todoLinks}
         </ul>
     `, {
-        headers: { "Content-Type": "text/html" }
+        headers: {
+            "Content-Type": "text/html",
+            ...corsHeaders,
+        }
     });
 };
 
@@ -97,7 +107,7 @@ const getTodoHandler = async (req) => {
     const id = parseInt(url.searchParams.get("id"));
 
     if (isNaN(id) || id < 1 || id > todos.length) {
-        return new Response("Invalid 'id' parameter", { status: 400 });
+        return new Response("Invalid 'id' parameter", { status: 400, headers: corsHeaders });
     }
 
     await delay(2000);
@@ -108,23 +118,40 @@ const getTodoHandler = async (req) => {
         title: todo.title,
         description: todo.description
     }), {
-        headers: { "Content-Type": "application/json" }
+        headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+        }
     });
 };
-
 
 const getTodosInfoHandler = async () => {
     await delay(2000);
 
     const todoSummary = todos.map(({ id, title }) => ({ id, title }));
     return new Response(JSON.stringify(todoSummary), {
-        headers: { "Content-Type": "application/json" }
+        headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+        }
+    });
+};
+
+const handleOptions = () => {
+    return new Response(null, {
+        status: 204,
+        headers: corsHeaders,
     });
 };
 
 serve({
     fetch(req) {
         const url = new URL(req.url);
+
+        if (req.method === "OPTIONS") {
+            return handleOptions();
+        }
+
         if (url.pathname === "/") {
             return rootHandler();
         }
@@ -134,7 +161,7 @@ serve({
         if (url.pathname === "/todos_info") {
             return getTodosInfoHandler();
         }
-        return new Response("Not found", { status: 404 });
+        return new Response("Not found", { status: 404, headers: corsHeaders });
     },
     port: PORT,
 });
